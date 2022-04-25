@@ -2,8 +2,10 @@
   <v-card class="overflow-hidden" id="container">
     <v-app-bar absolute dark shrink-on-scroll prominent fade-img-on-scroll scroll-target="#tabContainer">
 
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
-      <v-img src="./assets/icon-left-font-monochrome-white.png" max-height="200" max-width="250"></v-img>
+      <v-app-bar-nav-icon>
+        <v-img src="./assets/icon-transparent.png" alt="icone groupomania" max-height="32" max-width="32" />
+      </v-app-bar-nav-icon>
+      <v-app-bar-title>Groupomania</v-app-bar-title>
 
       <v-spacer></v-spacer>
       <div class="d-flex">
@@ -23,46 +25,50 @@
 
 
       <template v-slot:extension>
-        <v-tabs align-with-title>
+        <v-tabs align-with-title v-model="tab">
           <v-tab>
             Home
           </v-tab>
-          <v-tab v-if="isLoggedIn">{{ isLoggedIn }}</v-tab>
+          <v-tab v-if="isLoggedIn">Profile</v-tab>
           <v-tab v-if="isLoggedIn">Settings</v-tab>
         </v-tabs>
       </template>
     </v-app-bar>
-    <v-sheet id="tabContainer" max-height="100vh">
-      <v-container style="height: 1000px;">
-        <v-overlay :value="overlay" :opacity="opacity" style="width: 100%;">
-          <form>
-            <v-text-field v-model="email" :error-messages="emailErrors" label="E-mail" required
-              @input="$v.email.$touch()" @blur="$v.email.$touch()">
-            </v-text-field>
-            <!-- error message -->
+    <v-sheet id="tabContainer" max-height="100vh" class='overflow-y-auto'>
+      <v-tabs-items v-model="tab">
+        <v-tab-item>
+          <home-page-vue />
+        </v-tab-item>
 
-            <v-text-field v-model="password" :error-messages="passwordErrors" label="Mot de passe" required
-              @input="$v.password.$touch()" @blur="$v.password.$touch()"></v-text-field>
-          </form>
-          <div class="overlay-buttons">
-            <v-btn class="white--text" color="teal" @click="cancelOverlay()" small>
-              Annuler
-            </v-btn>
-            <v-btn class="white--text" color="success" small v-if="signup" @click="handleSignup()" :loading="loading"
-              :disabled="disabled">
-              S'inscrire
-            </v-btn>
-            <v-btn class="white--text" color="success" small v-if="login" @click="handleLogin()" :loading="loading">
-              Se connecter
-            </v-btn>
-          </div>
-          <div class="alert-overlay">
-            <v-alert dense type="info" v-if="passwordFeedback && signup" color='#00AFF4'>
-              {{ passwordFeedback }}
-            </v-alert>
-          </div>
-        </v-overlay>
-      </v-container>
+      </v-tabs-items>
+      <v-overlay :value="overlay" :opacity="opacity" style="width: 100%;">
+        <form>
+          <v-text-field v-model="email" :error-messages="emailErrors" label="E-mail" required @input="$v.email.$touch()"
+            @blur="$v.email.$touch()">
+          </v-text-field>
+          <!-- error message -->
+
+          <v-text-field v-model="password" :error-messages="passwordErrors" label="Mot de passe" required
+            @input="$v.password.$touch()" @blur="$v.password.$touch()"></v-text-field>
+        </form>
+        <div class="overlay-buttons">
+          <v-btn class="white--text" color="teal" @click="cancelOverlay()" small>
+            Annuler
+          </v-btn>
+          <v-btn class="white--text" color="success" small v-if="signup" @click="handleSignup()" :loading="loading"
+            :disabled="disabled">
+            S'inscrire
+          </v-btn>
+          <v-btn class="white--text" color="success" small v-if="login" @click="handleLogin()" :loading="loading">
+            Se connecter
+          </v-btn>
+        </div>
+        <div class="alert-overlay">
+          <v-alert dense type="info" v-if="passwordFeedback && signup" color='#00AFF4'>
+            {{ passwordFeedback }}
+          </v-alert>
+        </div>
+      </v-overlay>
     </v-sheet>
   </v-card>
 </template>
@@ -73,10 +79,15 @@ import { validationMixin } from 'vuelidate'
 import { required, minLength, email } from 'vuelidate/lib/validators'
 import zxcvbn from 'zxcvbn'
 import store from './store';
-
+import HomePageVue from "./components/HomePage.vue";
+import HomePage from "./components/HomePage.vue";
 export default {
   name: "App",
   mixins: [validationMixin],
+  components: {
+    HomePageVue,
+    HomePage
+  },
   validations: {
     email: {
       required,
@@ -88,6 +99,8 @@ export default {
     }
   },
   data: () => ({
+    collapseOnScroll: true,
+    tab: null,
     email: '',
     password: '',
     overlay: false,
@@ -155,7 +168,6 @@ export default {
         })
       });
       const data = await response.json();
-      console.log(data);
       if (response.status != 201)
         this.passwordFeedback = data.message;
       else {
@@ -210,6 +222,10 @@ body {
   margin: 0;
   height: 100%;
   overflow: hidden
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
 }
 
 .overlay-buttons {
