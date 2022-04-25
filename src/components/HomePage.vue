@@ -1,25 +1,32 @@
 <template>
   <v-container class="container">
-    <add-post-vue />
+    <div v-if="isLoggedIn">
+      <add-post-vue />
+    </div>
   </v-container>
 </template>
 
 <script>
 import AddPostVue from './AddPost.vue'
+import { mapState, mapActions } from "vuex";
+
 export default {
   name: 'Home',
   components: {
     AddPostVue
   },
   data: () => ({
-  })
+  }),
+  computed: {
+    ...mapState({ isLoggedIn: "isLoggedIn" }),
+  }
 }
 </script>
 
 
 <style scoped>
 .container {
-  margin-top: 12vh;
+
   height: 100vh;
 }
 </style>

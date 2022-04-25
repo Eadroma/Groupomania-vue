@@ -1,6 +1,6 @@
 <template>
-  <v-card class="overflow-hidden" id="container">
-    <v-app-bar absolute dark shrink-on-scroll prominent fade-img-on-scroll scroll-target="#tabContainer">
+  <v-card class="overflow-hidden" id="container" style="border-radius: 0">
+    <v-app-bar dark shrink-on-scroll prominent fade-img-on-scroll scroll-target="#tabContainer">
 
       <v-app-bar-nav-icon>
         <v-img src="./assets/icon-transparent.png" alt="icone groupomania" max-height="32" max-width="32" />
@@ -8,7 +8,7 @@
       <v-app-bar-title>Groupomania</v-app-bar-title>
 
       <v-spacer></v-spacer>
-      <div class="d-flex">
+      <div class="button-app-bar">
         <v-btn icon>
           <v-icon>mdi-magnify</v-icon>
         </v-btn>
@@ -18,8 +18,11 @@
         <v-btn v-if="!isLoggedIn" text small @click="(login = !login) && (overlay = !overlay)">
           se connecter
         </v-btn>
-        <v-btn v-if="isLoggedIn" text small @click="setIsLoggedIn">
+        <v-btn v-if="isLoggedIn" text small @click="setIsLoggedIn" id="desktopLogout">
           déconnexion
+        </v-btn>
+        <v-btn v-if="isLoggedIn" text small @click="setIsLoggedIn" id="phoneLogout">
+          <v-icon>mdi-logout</v-icon>
         </v-btn>
       </div>
 
@@ -224,6 +227,10 @@ body {
   overflow: hidden
 }
 
+header {
+  position: relative;
+}
+
 .overflow-y-auto {
   overflow-y: auto;
 }
@@ -247,5 +254,35 @@ body {
   width: 100%;
   z-index: 1;
   margin: 0;
+}
+
+#phoneLogout {
+  display: none;
+}
+
+.button-app-bar {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 60%;
+}
+
+button {
+  margin: 0;
+}
+
+@media only screen and (max-width: 320px) {
+  .v-app-bar-title__content {
+    display: none;
+  }
+
+  #phoneLogout {
+    display: block;
+  }
+
+  #desktopLogout {
+    display: none;
+  }
 }
 </style>
