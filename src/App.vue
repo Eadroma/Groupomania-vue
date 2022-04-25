@@ -137,13 +137,13 @@ export default {
       this.overlay = false;
       this.signup = false;
       this.login = false;
+      this.loading = false;
       this.email = '';
       this.password = '';
       this.passwordFeedback = '';
     },
     async handleSignup() {
       this.loading = true;
-      console.log(this.email, this.password)
       const response = await fetch('http://localhost:8081/api/users/create', {
         method: 'POST',
         headers: {
@@ -163,6 +163,7 @@ export default {
         this.passwordFeedback = '';
         this.setIsLoggedIn();
         this.setToken(data.token);
+        this.loading = false;
         this.overlay = false;
         this.signup = false;
         this.login = false;
@@ -170,9 +171,32 @@ export default {
         this.password = '';
       }
     },
-    handleLogin() {
-      console.log(this.isLoggedIn);
-      this.setIsLoggedIn()
+    async handleLogin() {
+      this.loading = true;
+      const reponse = await fetch('http://localhost:8081/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: this.email,
+          password: this.password
+        })
+      });
+      const data = await reponse.json();
+      if (reponse.status != 201)
+        this.passwordFeedback = data.message;
+      else {
+        this.passwordFeedback = '';
+        this.setIsLoggedIn();
+        this.setToken(data.token);
+        this.loading = false;
+        this.overlay = false;
+        this.signup = false;
+        this.login = false;
+        this.email = '';
+        this.password = '';
+      }
     }
   }
 }
