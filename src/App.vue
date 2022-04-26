@@ -1,6 +1,6 @@
 <template>
   <v-card class="overflow-hidden" id="container" style="border-radius: 0">
-    <v-app-bar dark shrink-on-scroll prominent fade-img-on-scroll scroll-target="#tabContainer">
+    <v-app-bar dark dense fade-img-on-scroll scroll-target="#tabContainer">
 
       <v-app-bar-nav-icon>
         <v-img src="./assets/icon-transparent.png" alt="icone groupomania" max-height="32" max-width="32" />
