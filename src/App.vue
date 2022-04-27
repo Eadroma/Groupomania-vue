@@ -18,7 +18,7 @@
         <v-btn v-if="!isLoggedIn" text small @click="(login = !login) && (overlay = !overlay)">
           se connecter
         </v-btn>
-        <v-btn v-if="isLoggedIn" text small @click="setIsLoggedIn" id="desktopLogout">
+        <v-btn v-if="isLoggedIn" text small @click="logout" id="desktopLogout">
           déconnexion
         </v-btn>
         <v-btn v-if="isLoggedIn" text small @click="setIsLoggedIn" id="phoneLogout">
@@ -32,7 +32,7 @@
           <v-tab>
             Home
           </v-tab>
-          <v-tab v-if="isLoggedIn">Profile</v-tab>
+          <v-tab v-if="isLoggedIn" @click="getConnectedUser">Profile</v-tab>
           <v-tab v-if="isLoggedIn">Settings</v-tab>
         </v-tabs>
       </template>
@@ -42,7 +42,12 @@
         <v-tab-item>
           <home-page-vue />
         </v-tab-item>
-
+        <v-tab-item>
+          <profile-page />
+        </v-tab-item>
+        <v-tab-item>
+          <settings-page />
+        </v-tab-item>
       </v-tabs-items>
       <v-overlay :value="overlay" :opacity="opacity" style="width: 100%;">
         <form>
@@ -83,13 +88,15 @@ import { required, minLength, email } from 'vuelidate/lib/validators'
 import zxcvbn from 'zxcvbn'
 import store from './store';
 import HomePageVue from "./components/HomePage.vue";
-import HomePage from "./components/HomePage.vue";
+import ProfilePage from './components/ProfilePage.vue';
+import SettingsPage from './components/SettingsPage.vue';
 export default {
   name: "App",
   mixins: [validationMixin],
   components: {
     HomePageVue,
-    HomePage
+    ProfilePage,
+    SettingsPage,
   },
   validations: {
     email: {
@@ -116,6 +123,11 @@ export default {
     opacity: 0.8,
     passwordFeedback: '',
   }),
+  mounted: async () => {
+    setInterval(() => {
+      store.dispatch('getConnectedUser');
+    }, 1800000);
+  },
   computed: {
     emailErrors() {
       const errors = [];
@@ -147,7 +159,7 @@ export default {
     ...mapState({ isLoggedIn: "isLoggedIn" }),
   },
   methods: {
-    ...mapActions(['setIsLoggedIn', 'setToken']),
+    ...mapActions(['setIsLoggedIn', 'setToken', 'getConnectedUser', 'clearState']),
     cancelOverlay() {
       this.$v.$reset()
       this.overlay = false;
@@ -157,6 +169,10 @@ export default {
       this.email = '';
       this.password = '';
       this.passwordFeedback = '';
+    },
+    logout() {
+      this.setToken('');
+      this.clearState();
     },
     async handleSignup() {
       this.loading = true;
@@ -174,10 +190,10 @@ export default {
       if (response.status != 201)
         this.passwordFeedback = data.message;
       else {
-        console.log('oui');
         this.passwordFeedback = '';
-        this.setIsLoggedIn();
         this.setToken(data.token);
+        this.setIsLoggedIn();
+        this.getConnectedUser();
         this.loading = false;
         this.overlay = false;
         this.signup = false;
@@ -203,8 +219,9 @@ export default {
         this.passwordFeedback = data.message;
       else {
         this.passwordFeedback = '';
-        this.setIsLoggedIn();
         this.setToken(data.token);
+        this.setIsLoggedIn();
+        this.getConnectedUser();
         this.loading = false;
         this.overlay = false;
         this.signup = false;
@@ -224,7 +241,13 @@ html,
 body {
   margin: 0;
   height: 100%;
-  overflow: hidden
+  overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+}
+
+
+.v-app-bar-title__content {
+  text-overflow: unset !important;
 }
 
 header {

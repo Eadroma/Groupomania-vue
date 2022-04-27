@@ -29,10 +29,10 @@ export default {
         validate() {
             console.log(content);
         },
+        reset() {
+            this.$refs.form.reset()
+        }
     },
-    reset() {
-        this.$refs.form.reset()
-    }
 }
 </script>
 

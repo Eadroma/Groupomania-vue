@@ -19,7 +19,6 @@ export default new Vuex.Store({
     user: null,
     token: null,
     isLoggedIn: false,
-    loading: false,
   },
   mutations: {
     setUser(state, user) {
@@ -48,11 +47,35 @@ export default new Vuex.Store({
     }) {
       commit('setIsLoggedIn')
     },
+    getConnectedUser() {
+      if (this.state.token == null)
+        return null;
+      return fetch('http://localhost:8081/api/users/me', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.state.token,
+          }
+        }).then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          if (data.name == 'TokenExpiredError') {
+            this.state.token = null;
+            this.state.isLoggedIn = false;
+            return null;
+          }
+          this.commit('setUser', data);
+        })
+    },
+    clearState() {
+      this.commit('setUser', null)
+      this.commit('setToken', null);
+      this.commit('setIsLoggedIn', false);
+    }
   },
   getters: {
     user: state => state.user,
     token: state => state.token,
     isLoggedIn: state => state.isLoggedIn,
-
   }
 })
