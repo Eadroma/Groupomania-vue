@@ -187,6 +187,8 @@ export default {
             getConnectedUser: "getConnectedUser",
             setUser: 'setUser',
             clearState: 'clearState',
+            setShowSettings: 'setShowSettings',
+            setTab: 'setTab',
         }),
         async sendForm() {
             const objectForm = {
@@ -285,16 +287,27 @@ export default {
             this.fileCover = this.fileAvatar = this.cover = this.avatar = null;
         },
         cancelForm() {
-            this.email = this.name = this.description = '';
-            this.emailError = this.nameError = this.descriptionError = false;
-            this.formLoading = true;
+            this.name = this.description = this.email = ''
             this.formDisabled = true;
-
+            this.formLoading = true;
             setTimeout(() => {
                 this.formDisabled = true;
                 this.formLoading = false;
-            }, 1000);
+            }, 2000);
         },
+        // close() {
+        //     this.email = this.name = this.description = '';
+        //     this.emailError = this.nameError = this.descriptionError = false;
+        //     this.formLoading = true;
+
+        //     setTimeout(() => {
+        //         this.formDisabled = true;
+        //         this.setShowSettings();
+        //         this.formLoading = false;
+        //         this.setTab(1);
+        //     }, 1000);
+
+        // },
         handleModal() {
             this.showModal = !this.showModal;
         },

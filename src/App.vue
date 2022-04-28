@@ -1,17 +1,27 @@
 <template>
-  <v-card class="overflow-hidden" id="container" style="border-radius: 0">
+  <div>
     <v-app-bar dark dense fade-img-on-scroll scroll-target="#tabContainer">
-
-      <v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click.prevent="setTab(0)">
         <v-img src="./assets/icon-transparent.png" alt="icone groupomania" max-height="32" max-width="32" />
       </v-app-bar-nav-icon>
-      <v-app-bar-title>Groupomania</v-app-bar-title>
+      <v-tabs align-with-title :value="tab">
+        <v-tab @click="setTab(0)">
+          Home
+        </v-tab>
+        <v-tab v-if="isLoggedIn" @click="getConnectedUser && setTab(1)">Mon profile</v-tab>
+        <v-tab v-if="isLoggedIn" @click="setTab(2)">Settings</v-tab>
+        <v-tab v-if="userView" @click="setTab(3)">Profile de {{ userView.name }}</v-tab>
+      </v-tabs>
+      <v-autocomplete class="searchInput" allow-overflow menu-props="auto, overflowY" v-model="searchInput"
+        :items="users" item-text="name" clearable hide-details item-value="name" label="Qui recherchez-vous ?"
+        prepend-inner-icon="mdi-magnify" dense solo flat outlined color="button">
+        <template v-slot:item="{ item }">
+          <v-list-item @click="redirect(item.id)">{{ item.name }} {{ item.email }}</v-list-item>
+        </template>
+      </v-autocomplete>
+      <div class="button-app-bar" data-app>
+        {{ search }}
 
-      <v-spacer></v-spacer>
-      <div class="button-app-bar">
-        <v-btn icon>
-          <v-icon>mdi-magnify</v-icon>
-        </v-btn>
         <v-btn v-if="!isLoggedIn" text small @click="(signup = !signup) && (overlay = !overlay)">
           s'inscrire
         </v-btn>
@@ -25,60 +35,55 @@
           <v-icon>mdi-logout</v-icon>
         </v-btn>
       </div>
-
-
-      <template v-slot:extension>
-        <v-tabs align-with-title v-model="tab">
-          <v-tab>
-            Home
-          </v-tab>
-          <v-tab v-if="isLoggedIn" @click="getConnectedUser">Profile</v-tab>
-          <v-tab v-if="isLoggedIn">Settings</v-tab>
-        </v-tabs>
-      </template>
     </v-app-bar>
-    <v-sheet id="tabContainer" max-height="100vh" class='overflow-y-auto'>
-      <v-tabs-items v-model="tab">
-        <v-tab-item>
-          <home-page-vue />
-        </v-tab-item>
-        <v-tab-item>
-          <profile-page />
-        </v-tab-item>
-        <v-tab-item>
-          <settings-page />
-        </v-tab-item>
-      </v-tabs-items>
-      <v-overlay :value="overlay" :opacity="opacity" style="width: 100%;">
-        <form>
-          <v-text-field v-model="email" :error-messages="emailErrors" label="E-mail" required @input="$v.email.$touch()"
-            @blur="$v.email.$touch()">
-          </v-text-field>
-          <!-- error message -->
+    <v-card class="overflow-hidden" id="container" style="border-radius: 0">
 
-          <v-text-field v-model="password" :error-messages="passwordErrors" label="Mot de passe" required
-            @input="$v.password.$touch()" @blur="$v.password.$touch()"></v-text-field>
-        </form>
-        <div class="overlay-buttons">
-          <v-btn class="white--text" color="teal" @click="cancelOverlay()" small>
-            Annuler
-          </v-btn>
-          <v-btn class="white--text" color="success" small v-if="signup" @click="handleSignup()" :loading="loading"
-            :disabled="disabled">
-            S'inscrire
-          </v-btn>
-          <v-btn class="white--text" color="success" small v-if="login" @click="handleLogin()" :loading="loading">
-            Se connecter
-          </v-btn>
-        </div>
-        <div class="alert-overlay">
-          <v-alert dense type="info" v-if="passwordFeedback && signup" color='#00AFF4'>
-            {{ passwordFeedback }}
-          </v-alert>
-        </div>
-      </v-overlay>
-    </v-sheet>
-  </v-card>
+      <v-sheet id="tabContainer" max-height="100vh">
+        <v-tabs-items :value="tab">
+          <v-tab-item>
+            <home-page-vue />
+          </v-tab-item>
+          <v-tab-item>
+            <my-profile-page />
+          </v-tab-item>
+          <v-tab-item v-if="showSettings">
+            <settings-page />
+          </v-tab-item>
+          <v-tab-item v-if="userView">
+            <profile-page :user="userView" />
+          </v-tab-item>
+
+        </v-tabs-items>
+        <v-overlay :value="overlay" :opacity="opacity" style="width: 100%;">
+          <form>
+            <v-text-field v-model="email" :error-messages="emailErrors" label="E-mail" required
+              @input="$v.email.$touch()" @blur="$v.email.$touch()">
+            </v-text-field>
+
+            <v-text-field v-model="password" :error-messages="passwordErrors" label="Mot de passe" required
+              @input="$v.password.$touch()" @blur="$v.password.$touch()"></v-text-field>
+          </form>
+          <div class="overlay-buttons">
+            <v-btn class="white--text" color="teal" @click="cancelOverlay()" small>
+              Annuler
+            </v-btn>
+            <v-btn class="white--text" color="success" small v-if="signup" @click="handleSignup()" :loading="loading"
+              :disabled="disabled">
+              S'inscrire
+            </v-btn>
+            <v-btn class="white--text" color="success" small v-if="login" @click="handleLogin()" :loading="loading">
+              Se connecter
+            </v-btn>
+          </div>
+          <div class="alert-overlay">
+            <v-alert dense type="info" v-if="passwordFeedback && signup" color='#00AFF4'>
+              {{ passwordFeedback }}
+            </v-alert>
+          </div>
+        </v-overlay>
+      </v-sheet>
+    </v-card>
+  </div>
 </template>
 
 <script>
@@ -88,15 +93,17 @@ import { required, minLength, email } from 'vuelidate/lib/validators'
 import zxcvbn from 'zxcvbn'
 import store from './store';
 import HomePageVue from "./components/HomePage.vue";
-import ProfilePage from './components/ProfilePage.vue';
+import MyProfilePage from './components/MyProfilePage.vue';
+import ProfilePage from "./components/ProfilePage.vue";
 import SettingsPage from './components/SettingsPage.vue';
 export default {
   name: "App",
   mixins: [validationMixin],
   components: {
     HomePageVue,
-    ProfilePage,
+    MyProfilePage,
     SettingsPage,
+    ProfilePage
   },
   validations: {
     email: {
@@ -110,7 +117,6 @@ export default {
   },
   data: () => ({
     collapseOnScroll: true,
-    tab: null,
     email: '',
     password: '',
     overlay: false,
@@ -122,6 +128,11 @@ export default {
     passwordError: false,
     opacity: 0.8,
     passwordFeedback: '',
+    searchInput: null,
+    users: null,
+    userView: null,
+    search: null,
+
   }),
   mounted: async () => {
     setInterval(() => {
@@ -156,10 +167,13 @@ export default {
       this.disabled = !this.emailError && !this.passwordError ? false : true;
       return errors;
     },
-    ...mapState({ isLoggedIn: "isLoggedIn" }),
+    ...mapState({ isLoggedIn: "isLoggedIn", showSettings: 'showSettings', tab: 'tab' }),
+  },
+  created() {
+    this.initData();
   },
   methods: {
-    ...mapActions(['setIsLoggedIn', 'setToken', 'getConnectedUser', 'clearState']),
+    ...mapActions(['setIsLoggedIn', 'setToken', 'getConnectedUser', 'clearState', 'setTab']),
     cancelOverlay() {
       this.$v.$reset()
       this.overlay = false;
@@ -170,8 +184,22 @@ export default {
       this.password = '';
       this.passwordFeedback = '';
     },
+    async initData() {
+      const response = await fetch('http://localhost:8081/api/users/', {
+        method: "GET"
+      });
+
+      this.users = await response.json();
+      console.log(this.users);
+
+    },
+    async redirect(id) {
+      const response = await fetch(`http://localhost:8081/api/users/${id}`);
+      const user = await response.json();
+      this.userView = user;
+      this.setTab(this.showSettings ? 3 : 2);
+    },
     logout() {
-      this.setToken('');
       this.clearState();
     },
     async handleSignup() {
@@ -245,13 +273,18 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
+.v-card {
+  z-index: 0;
+}
 
 .v-app-bar-title__content {
   text-overflow: unset !important;
 }
 
 header {
+  z-index: 1;
   position: relative;
+  height: 64px !important;
 }
 
 .overflow-y-auto {
@@ -291,8 +324,26 @@ header {
   width: 60%;
 }
 
+.v-toolbar__content {
+  height: 64px !important;
+}
+
+/* .v-window {
+  overflow: visible !important;
+} */
+.v-item-group {
+  position: auto !important;
+  background-color: #fff;
+}
+
 button {
   margin: 0;
+}
+
+.searchInput {
+  z-index: 4000;
+  width: 100%;
+  margin: 0 10px;
 }
 
 @media only screen and (max-width: 320px) {

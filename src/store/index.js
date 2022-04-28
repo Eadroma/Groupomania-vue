@@ -19,6 +19,8 @@ export default new Vuex.Store({
     user: null,
     token: null,
     isLoggedIn: false,
+    showSettings: false,
+    tab: null,
   },
   mutations: {
     setUser(state, user) {
@@ -29,6 +31,12 @@ export default new Vuex.Store({
     },
     setIsLoggedIn(state) {
       state.isLoggedIn = !state.isLoggedIn
+    },
+    setShowSettings(state) {
+      state.showSettings = !state.showSettings
+    },
+    setTab(state, tab) {
+      state.tab = tab
     }
   },
   actions: {
@@ -36,6 +44,11 @@ export default new Vuex.Store({
       commit
     }, user) {
       commit('setUser', user)
+    },
+    setTab({
+      commit
+    }, tab) {
+      commit('setTab', tab)
     },
     setToken({
       commit
@@ -46,6 +59,11 @@ export default new Vuex.Store({
       commit
     }) {
       commit('setIsLoggedIn')
+    },
+    setShowSettings({
+      commit
+    }) {
+      commit('setShowSettings')
     },
     getConnectedUser() {
       if (this.state.token == null)
@@ -71,11 +89,13 @@ export default new Vuex.Store({
       this.commit('setUser', null)
       this.commit('setToken', null);
       this.commit('setIsLoggedIn', false);
-    }
+    },
+
   },
   getters: {
     user: state => state.user,
     token: state => state.token,
     isLoggedIn: state => state.isLoggedIn,
+    tab: state => state.tab
   }
 })
