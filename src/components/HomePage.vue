@@ -3,17 +3,20 @@
     <div v-if="isLoggedIn">
       <add-post-vue />
     </div>
+    <all-post-vue />
   </v-container>
 </template>
 
 <script>
 import AddPostVue from './AddPost.vue'
+import AllPostVue from './AllPost.vue';
 import { mapState, mapActions } from "vuex";
 
 export default {
   name: 'Home',
   components: {
-    AddPostVue
+    AddPostVue,
+    AllPostVue
   },
   data: () => ({
   }),
@@ -25,8 +28,4 @@ export default {
 
 
 <style scoped>
-.container {
-
-  height: 100vh;
-}
 </style>

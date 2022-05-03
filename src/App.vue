@@ -46,7 +46,7 @@
           <v-tab-item>
             <my-profile-page />
           </v-tab-item>
-          <v-tab-item v-if="showSettings">
+          <v-tab-item>
             <settings-page />
           </v-tab-item>
           <v-tab-item v-if="userView">
@@ -60,8 +60,8 @@
               @input="$v.email.$touch()" @blur="$v.email.$touch()">
             </v-text-field>
 
-            <v-text-field v-model="password" :error-messages="passwordErrors" label="Mot de passe" required
-              @input="$v.password.$touch()" @blur="$v.password.$touch()"></v-text-field>
+            <v-text-field v-model="password" type="password" :error-messages="passwordErrors" label="Mot de passe"
+              required @input="$v.password.$touch()" @blur="$v.password.$touch()"></v-text-field>
           </form>
           <div class="overlay-buttons">
             <v-btn class="white--text" color="teal" @click="cancelOverlay()" small>
@@ -281,9 +281,13 @@ body {
   text-overflow: unset !important;
 }
 
+#tabContainer {
+  overflow: hidden;
+}
+
 header {
   z-index: 1;
-  position: relative;
+  position: fixed !important;
   height: 64px !important;
 }
 
@@ -328,9 +332,11 @@ header {
   height: 64px !important;
 }
 
-/* .v-window {
-  overflow: visible !important;
-} */
+.v-window {
+  overflow: scroll !important;
+  margin-top: 4rem;
+}
+
 .v-item-group {
   position: auto !important;
   background-color: #fff;
