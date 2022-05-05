@@ -7,8 +7,11 @@ import { updateUser } from './updateUser'
 import { uploadAvatar } from './uploadAvatar'
 import { uploadCover } from './uploadCover'
 import { deleteUser } from './deleteUser'
-
+import { getPost } from './getPost'
+import { like } from './like'
 export {
+  like,
+  getPost,
   getPosts,
   getUser,
   getUsers,

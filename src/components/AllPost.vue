@@ -12,61 +12,7 @@
       <v-container>
         <v-col>
           <v-col v-for="post in posts" :key="post.id" cols="auto" md="auto">
-            <v-item v-slot="{ toggle }">
-              <v-card class="postCard" outlined elevation="8" @click="toggle">
-                <v-list-item>
-                  <v-list-item-avatar color="grey darken-3">
-                    <v-img
-                      class="elevation-6"
-                      alt="image"
-                      :src="getUser(post.userId).imgUrl"
-                    >
-                    </v-img>
-                  </v-list-item-avatar>
-
-                  <v-list-item-content>
-                    <v-list-item-title style="margin-left: 10px"
-                      >{{ getUser(post.userId).name }} -
-                      {{ getUser(post.userId).email }} -
-                      {{
-                        new Date(post.createdAt).toLocaleDateString()
-                      }}</v-list-item-title
-                    >
-                  </v-list-item-content>
-                </v-list-item>
-                <v-card-text class="text-h5 font-weight-bold">
-                  {{ post.textContent }}
-                  <v-spacer></v-spacer>
-                </v-card-text>
-                <div v-if="post && post.imgUrl">
-                  <v-img :src="post.imgUrl" contain max-height="500px"></v-img>
-                </div>
-
-                <v-card-actions class="postButtons">
-                  <div>
-                    <v-btn class="mx-2 like" fab small>
-                      <v-icon> mdi-heart </v-icon>
-                    </v-btn>
-                    <strong>
-                      {{ post.likes }}
-                    </strong>
-                  </div>
-                  <div v-if="isLoggedIn && user.id == post.userId">
-                    <v-btn class="mx-2 comment" fab small>
-                      <v-icon> mdi-pencil </v-icon>
-                    </v-btn>
-                  </div>
-                  <div>
-                    <strong>
-                      {{ post.comments.length }}
-                    </strong>
-                    <v-btn class="mx-2 comment" fab small>
-                      <v-icon> mdi-chat </v-icon>
-                    </v-btn>
-                  </div>
-                </v-card-actions>
-              </v-card>
-            </v-item>
+            <OnePost :id="post.id" />
           </v-col>
         </v-col>
       </v-container>
@@ -77,6 +23,8 @@
 <script>
 import { mapState } from 'vuex'
 import { getPosts, getUsers } from '@/helpers/helper'
+import OnePostVue from './OnePost.vue'
+import OnePost from './OnePost.vue'
 export default {
   name: 'AllPost',
   data: () => ({
@@ -84,6 +32,10 @@ export default {
     users: null,
     loading: true,
   }),
+  components: {
+    OnePostVue,
+    OnePost,
+  },
   computed: {
     ...mapState({ user: 'user', isLoggedIn: 'isLoggedIn' }),
     isLoading() {
@@ -105,8 +57,6 @@ export default {
       this.loading = true
       const data = await getUsers()
       this.users = data
-      console.log('data: ' + { ...data })
-      console.log(data)
       this.loading = false
     },
     getUser(id) {
