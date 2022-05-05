@@ -9,23 +9,20 @@
 
 <script>
 import AddPostVue from './AddPost.vue'
-import AllPostVue from './AllPost.vue';
-import { mapState, mapActions } from "vuex";
+import AllPostVue from './AllPost.vue'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'Home',
   components: {
     AddPostVue,
-    AllPostVue
+    AllPostVue,
   },
-  data: () => ({
-  }),
+  data: () => ({}),
   computed: {
-    ...mapState({ isLoggedIn: "isLoggedIn" }),
-  }
+    ...mapState({ isLoggedIn: 'isLoggedIn' }),
+  },
 }
 </script>
 
-
-<style scoped>
-</style>
+<style scoped></style>

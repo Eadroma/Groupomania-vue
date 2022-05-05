@@ -96,6 +96,7 @@ import HomePageVue from "./components/HomePage.vue";
 import MyProfilePage from './components/MyProfilePage.vue';
 import ProfilePage from "./components/ProfilePage.vue";
 import SettingsPage from './components/SettingsPage.vue';
+import { getUsers, getUser, createUser, loginUser } from "./helpers/helper";
 export default {
   name: "App",
   mixins: [validationMixin],
@@ -185,18 +186,10 @@ export default {
       this.passwordFeedback = '';
     },
     async initData() {
-      const response = await fetch('http://localhost:8081/api/users/', {
-        method: "GET"
-      });
-
-      this.users = await response.json();
-      console.log(this.users);
-
+      this.users = await getUsers();
     },
     async redirect(id) {
-      const response = await fetch(`http://localhost:8081/api/users/${id}`);
-      const user = await response.json();
-      this.userView = user;
+      this.userView = await getUser(id);
       this.setTab(this.showSettings ? 3 : 2);
     },
     logout() {
@@ -204,17 +197,8 @@ export default {
     },
     async handleSignup() {
       this.loading = true;
-      const response = await fetch('http://localhost:8081/api/users/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: this.email,
-          password: this.password
-        })
-      });
-      const data = await response.json();
+      const response = await createUser(this.email, this.password);
+      const data = response.json();
       if (response.status != 201)
         this.passwordFeedback = data.message;
       else {
@@ -232,16 +216,7 @@ export default {
     },
     async handleLogin() {
       this.loading = true;
-      const reponse = await fetch('http://localhost:8081/api/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: this.email,
-          password: this.password
-        })
-      });
+      const reponse = await loginUser(this.email, this.password);
       const data = await reponse.json();
       if (reponse.status != 201)
         this.passwordFeedback = data.message;
@@ -335,10 +310,10 @@ header {
 .v-window {
   overflow: scroll !important;
   margin-top: 4rem;
+  height: 96vh;
 }
 
 .v-item-group {
-  position: auto !important;
   background-color: #fff;
 }
 
