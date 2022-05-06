@@ -12,7 +12,7 @@
       <v-container>
         <v-col>
           <v-col v-for="post in posts" :key="post.id" cols="auto" md="auto">
-            <OnePost :id="post.id" />
+            <OnePost :id="post.id" :users="users" />
           </v-col>
         </v-col>
       </v-container>
@@ -85,12 +85,10 @@ export default {
 }
 
 .comment {
-  color: #fff !important;
-  background-color: #1985a1 !important;
+  color: #1985a1 !important;
 }
 
 .like {
-  color: #fff !important;
-  background-color: rgb(208, 106, 108) !important;
+  color: rgb(208, 106, 108) !important;
 }
 </style>

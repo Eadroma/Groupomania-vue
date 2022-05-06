@@ -2,81 +2,157 @@
   <div>
     <v-app-bar dark dense fade-img-on-scroll scroll-target="#tabContainer">
       <v-app-bar-nav-icon @click.prevent="setTab(0)">
-        <v-img src="./assets/icon-transparent.png" alt="icone groupomania" max-height="32" max-width="32" />
+        <v-img
+          src="./assets/icon-transparent.png"
+          alt="icone groupomania"
+          max-height="32"
+          max-width="32"
+        />
       </v-app-bar-nav-icon>
       <v-tabs align-with-title :value="tab">
-        <v-tab @click="setTab(0)">
-          Home
-        </v-tab>
-        <v-tab v-if="isLoggedIn" @click="getConnectedUser && setTab(1)">Mon profile</v-tab>
+        <v-tab @click="setTab(0)"> Home </v-tab>
+        <v-tab v-if="isLoggedIn" @click="getConnectedUser && setTab(1)"
+          >Mon profile</v-tab
+        >
         <v-tab v-if="isLoggedIn" @click="setTab(2)">Settings</v-tab>
-        <v-tab v-if="userView" @click="setTab(3)">Profile de {{ userView.name }}</v-tab>
+        <v-tab v-if="checkTab" @click="setTab(isLoggedIn ? 3 : 1)">
+          Profile de {{ userView.name }}</v-tab
+        >
       </v-tabs>
-      <v-autocomplete class="searchInput" allow-overflow menu-props="auto, overflowY" v-model="searchInput"
-        :items="users" item-text="name" clearable hide-details item-value="name" label="Qui recherchez-vous ?"
-        prepend-inner-icon="mdi-magnify" dense solo flat outlined color="button">
+      <v-autocomplete
+        class="searchInput"
+        allow-overflow
+        menu-props="auto, overflowY"
+        v-model="searchInput"
+        :items="users"
+        item-text="name"
+        clearable
+        hide-details
+        item-value="name"
+        label="Qui recherchez-vous ?"
+        prepend-inner-icon="mdi-magnify"
+        dense
+        solo
+        flat
+        outlined
+        color="button"
+      >
         <template v-slot:item="{ item }">
-          <v-list-item @click="redirect(item.id)">{{ item.name }} {{ item.email }}</v-list-item>
+          <v-list-item @click="redirect(item.id)"
+            >{{ item.name }} {{ item.email }}</v-list-item
+          >
         </template>
       </v-autocomplete>
       <div class="button-app-bar" data-app>
         {{ search }}
 
-        <v-btn v-if="!isLoggedIn" text small @click="(signup = !signup) && (overlay = !overlay)">
+        <v-btn
+          v-if="!isLoggedIn"
+          text
+          small
+          @click=";(signup = !signup) && (overlay = !overlay)"
+        >
           s'inscrire
         </v-btn>
-        <v-btn v-if="!isLoggedIn" text small @click="(login = !login) && (overlay = !overlay)">
+        <v-btn
+          v-if="!isLoggedIn"
+          text
+          small
+          @click=";(login = !login) && (overlay = !overlay)"
+        >
           se connecter
         </v-btn>
         <v-btn v-if="isLoggedIn" text small @click="logout" id="desktopLogout">
           déconnexion
         </v-btn>
-        <v-btn v-if="isLoggedIn" text small @click="setIsLoggedIn" id="phoneLogout">
+        <v-btn
+          v-if="isLoggedIn"
+          text
+          small
+          @click="setIsLoggedIn"
+          id="phoneLogout"
+        >
           <v-icon>mdi-logout</v-icon>
         </v-btn>
       </div>
     </v-app-bar>
     <v-card class="overflow-hidden" id="container" style="border-radius: 0">
-
       <v-sheet id="tabContainer" max-height="100vh">
         <v-tabs-items :value="tab">
           <v-tab-item>
             <home-page-vue />
           </v-tab-item>
-          <v-tab-item>
+          <v-tab-item v-if="isLoggedIn">
             <my-profile-page />
           </v-tab-item>
-          <v-tab-item>
+          <v-tab-item v-if="isLoggedIn">
             <settings-page />
           </v-tab-item>
           <v-tab-item v-if="userView">
             <profile-page :user="userView" />
           </v-tab-item>
-
         </v-tabs-items>
-        <v-overlay :value="overlay" :opacity="opacity" style="width: 100%;">
+        <v-overlay :value="overlay" :opacity="opacity" style="width: 100%">
           <form>
-            <v-text-field v-model="email" :error-messages="emailErrors" label="E-mail" required
-              @input="$v.email.$touch()" @blur="$v.email.$touch()">
+            <v-text-field
+              v-model="email"
+              :error-messages="emailErrors"
+              label="E-mail"
+              required
+              @input="$v.email.$touch()"
+              @blur="$v.email.$touch()"
+            >
             </v-text-field>
 
-            <v-text-field v-model="password" type="password" :error-messages="passwordErrors" label="Mot de passe"
-              required @input="$v.password.$touch()" @blur="$v.password.$touch()"></v-text-field>
+            <v-text-field
+              v-model="password"
+              type="password"
+              :error-messages="passwordErrors"
+              label="Mot de passe"
+              required
+              @input="$v.password.$touch()"
+              @blur="$v.password.$touch()"
+              @keyup.enter="signup ? handleSignup() : handleLogin()"
+            ></v-text-field>
           </form>
           <div class="overlay-buttons">
-            <v-btn class="white--text" color="teal" @click="cancelOverlay()" small>
+            <v-btn
+              class="white--text"
+              color="teal"
+              @click="cancelOverlay()"
+              small
+            >
               Annuler
             </v-btn>
-            <v-btn class="white--text" color="success" small v-if="signup" @click="handleSignup()" :loading="loading"
-              :disabled="disabled">
+            <v-btn
+              class="white--text"
+              color="success"
+              small
+              v-if="signup"
+              @click="handleSignup()"
+              :loading="loading"
+              :disabled="disabled"
+            >
               S'inscrire
             </v-btn>
-            <v-btn class="white--text" color="success" small v-if="login" @click="handleLogin()" :loading="loading">
+            <v-btn
+              class="white--text"
+              color="success"
+              small
+              v-if="login"
+              @click="handleLogin()"
+              :loading="loading"
+            >
               Se connecter
             </v-btn>
           </div>
           <div class="alert-overlay">
-            <v-alert dense type="info" v-if="passwordFeedback && signup" color='#00AFF4'>
+            <v-alert
+              dense
+              type="info"
+              v-if="passwordFeedback && signup"
+              color="#00AFF4"
+            >
               {{ passwordFeedback }}
             </v-alert>
           </div>
@@ -87,34 +163,34 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions } from 'vuex'
 import { validationMixin } from 'vuelidate'
 import { required, minLength, email } from 'vuelidate/lib/validators'
 import zxcvbn from 'zxcvbn'
-import store from './store';
-import HomePageVue from "./components/HomePage.vue";
-import MyProfilePage from './components/MyProfilePage.vue';
-import ProfilePage from "./components/ProfilePage.vue";
-import SettingsPage from './components/SettingsPage.vue';
-import { getUsers, getUser, createUser, loginUser } from "./helpers/helper";
+import store from './store'
+import HomePageVue from './components/HomePage.vue'
+import MyProfilePage from './components/MyProfilePage.vue'
+import ProfilePage from './components/ProfilePage.vue'
+import SettingsPage from './components/SettingsPage.vue'
+import { getUsers, getUser, createUser, loginUser } from './helpers/helper'
 export default {
-  name: "App",
+  name: 'App',
   mixins: [validationMixin],
   components: {
     HomePageVue,
     MyProfilePage,
     SettingsPage,
-    ProfilePage
+    ProfilePage,
   },
   validations: {
     email: {
       required,
-      email
+      email,
     },
     password: {
       required,
-      minLength: minLength(8)
-    }
+      minLength: minLength(8),
+    },
   },
   data: () => ({
     collapseOnScroll: true,
@@ -131,113 +207,127 @@ export default {
     passwordFeedback: '',
     searchInput: null,
     users: null,
-    userView: null,
     search: null,
-
   }),
   mounted: async () => {
     setInterval(() => {
-      store.dispatch('getConnectedUser');
-    }, 1800000);
+      store.dispatch('getConnectedUser')
+    }, 1800000)
   },
   computed: {
+    checkTab() {
+      return this.userView && this.userView.id != this.user?.id
+    },
     emailErrors() {
-      const errors = [];
-      if (this.login) return errors;
-      if (!this.$v.email.$dirty) return errors;
-      !this.$v.email.required && errors.push('L\'email est requis');
-      !this.$v.email.email && errors.push('L\'email n\'est pas valide');
-      this.emailError = errors.length != 0;
-      this.disabled = this.emailError && this.passwordError ? false : true;
-      return errors;
+      const errors = []
+      if (this.login) return errors
+      if (!this.$v.email.$dirty) return errors
+      !this.$v.email.required && errors.push("L'email est requis")
+      !this.$v.email.email && errors.push("L'email n'est pas valide")
+      this.emailError = errors.length != 0
+      this.disabled = this.emailError && this.passwordError ? false : true
+      return errors
     },
     passwordErrors() {
-      const errors = [];
-      if (this.login) return errors;
-      if (!this.$v.password.$dirty) return errors;
-      !this.$v.password.required && errors.push('Le mot de passe est requis');
-      !this.$v.password.minLength && errors.push('Le mot de passe doit contenir au moins 8 caractères');
-      const passwordSecure = zxcvbn(this.password);
+      const errors = []
+      if (this.login) return errors
+      if (!this.$v.password.$dirty) return errors
+      !this.$v.password.required && errors.push('Le mot de passe est requis')
+      !this.$v.password.minLength &&
+        errors.push('Le mot de passe doit contenir au moins 8 caractères')
+      const passwordSecure = zxcvbn(this.password)
       if (passwordSecure.score < 2) {
-        errors.push(passwordSecure.feedback.warning);
-        this.passwordFeedback = passwordSecure.feedback.suggestions[0];
+        errors.push(passwordSecure.feedback.warning)
+        this.passwordFeedback = passwordSecure.feedback.suggestions[0]
       } else {
-        this.passwordFeedback = '';
+        this.passwordFeedback = ''
       }
-      this.passwordError = errors.length != 0;
-      this.disabled = !this.emailError && !this.passwordError ? false : true;
-      return errors;
+      this.passwordError = errors.length != 0
+      this.disabled = !this.emailError && !this.passwordError ? false : true
+      return errors
     },
-    ...mapState({ isLoggedIn: "isLoggedIn", showSettings: 'showSettings', tab: 'tab' }),
+    ...mapState({
+      isLoggedIn: 'isLoggedIn',
+      showSettings: 'showSettings',
+      tab: 'tab',
+      userView: 'userView',
+      user: 'user',
+    }),
   },
   created() {
-    this.initData();
+    this.initData()
   },
   methods: {
-    ...mapActions(['setIsLoggedIn', 'setToken', 'getConnectedUser', 'clearState', 'setTab']),
+    ...mapActions([
+      'setIsLoggedIn',
+      'setToken',
+      'getConnectedUser',
+      'clearState',
+      'setTab',
+      'setUserView',
+    ]),
     cancelOverlay() {
       this.$v.$reset()
-      this.overlay = false;
-      this.signup = false;
-      this.login = false;
-      this.loading = false;
-      this.email = '';
-      this.password = '';
-      this.passwordFeedback = '';
+      this.overlay = false
+      this.signup = false
+      this.login = false
+      this.loading = false
+      this.email = ''
+      this.password = ''
+      this.passwordFeedback = ''
     },
     async initData() {
-      this.users = await getUsers();
+      this.users = await getUsers()
     },
     async redirect(id) {
-      this.userView = await getUser(id);
-      this.setTab(this.showSettings ? 3 : 2);
+      if (this.isLoggedIn && id === this.user.id) this.setTab(1)
+      else {
+        this.setUserView(await getUser(id))
+        this.setTab(this.showSettings ? 3 : 2)
+      }
     },
     logout() {
-      this.clearState();
+      this.clearState()
     },
     async handleSignup() {
-      this.loading = true;
-      const response = await createUser(this.email, this.password);
-      const data = response.json();
-      if (response.status != 201)
-        this.passwordFeedback = data.message;
+      this.loading = true
+      const response = await createUser(this.email, this.password)
+      const data = response.json()
+      if (response.status != 201) this.passwordFeedback = data.message
       else {
-        this.passwordFeedback = '';
-        this.setToken(data.token);
-        this.setIsLoggedIn();
-        this.getConnectedUser();
-        this.loading = false;
-        this.overlay = false;
-        this.signup = false;
-        this.login = false;
-        this.email = '';
-        this.password = '';
+        this.passwordFeedback = ''
+        this.setToken(data.token)
+        this.setIsLoggedIn()
+        this.getConnectedUser()
+        this.loading = false
+        this.overlay = false
+        this.signup = false
+        this.login = false
+        this.email = ''
+        this.password = ''
       }
     },
     async handleLogin() {
-      this.loading = true;
-      const reponse = await loginUser(this.email, this.password);
-      const data = await reponse.json();
-      if (reponse.status != 201)
-        this.passwordFeedback = data.message;
+      this.loading = true
+      const reponse = await loginUser(this.email, this.password)
+      const data = await reponse.json()
+      if (reponse.status != 201) this.passwordFeedback = data.message
       else {
-        this.passwordFeedback = '';
-        this.setToken(data.token);
-        this.setIsLoggedIn();
-        this.getConnectedUser();
-        this.loading = false;
-        this.overlay = false;
-        this.signup = false;
-        this.login = false;
-        this.email = '';
-        this.password = '';
+        this.passwordFeedback = ''
+        this.setToken(data.token)
+        this.setIsLoggedIn()
+        this.getConnectedUser()
+        this.loading = false
+        this.overlay = false
+        this.signup = false
+        this.login = false
+        this.email = ''
+        this.password = ''
       }
-    }
-  }
+    },
+  },
 }
-
 </script>
-
 
 <style>
 html,
@@ -278,7 +368,7 @@ header {
 }
 
 .v-messages__message {
-  color: #D06A6C;
+  color: #d06a6c;
   font-weight: bold;
 }
 
