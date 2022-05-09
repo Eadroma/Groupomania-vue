@@ -20,7 +20,7 @@
             show-size
             class="cover-icon"
             hide-input
-            prepend-icon="mdi-camera"
+            prepend-icon="mdi-camera-plus"
             @change="previewCover"
           >
           </v-file-input>
@@ -179,7 +179,12 @@
 import { mapState, mapActions } from 'vuex'
 import { validationMixin } from 'vuelidate'
 import { email, minLength, maxLength } from 'vuelidate/lib/validators'
-import { deleteUser, updateUser, uploadCover } from '@/helpers/helper'
+import {
+  deleteUser,
+  updateUser,
+  uploadCover,
+  uploadAvatar,
+} from '@/helpers/helper'
 export default {
   name: 'SettingsPage',
   mixins: [validationMixin],
@@ -308,7 +313,7 @@ export default {
     async uploadAvatar() {
       const formData = new FormData()
       formData.append('image', this.fileAvatar)
-      const response = await uploadCover(formData, this.user.id, this.token)
+      const response = await uploadAvatar(formData, this.user.id, this.token)
       const data = await response.json()
       if (data.user) {
         this.setUser(data.user)

@@ -50,7 +50,7 @@ export default {
     async getPosts() {
       this.loading = true
       const data = await getPosts()
-      this.posts = data.posts
+      this.posts = data.posts.reverse()
       this.loading = false
     },
     async getUsers() {

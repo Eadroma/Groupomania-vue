@@ -50,7 +50,9 @@
           v-if="!isLoggedIn"
           text
           small
-          @click=";(signup = !signup) && (overlay = !overlay)"
+          @click="
+            ;(signup = !signup) && (overlay = !overlay) && (login = false)
+          "
         >
           s'inscrire
         </v-btn>
@@ -58,7 +60,7 @@
           v-if="!isLoggedIn"
           text
           small
-          @click=";(login = !login) && (overlay = !overlay)"
+          @click=";(login = !login) && (overlay = !overlay) && (signup = false)"
         >
           se connecter
         </v-btn>

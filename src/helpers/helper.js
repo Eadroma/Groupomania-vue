@@ -9,6 +9,8 @@ import { uploadCover } from './uploadCover'
 import { deleteUser } from './deleteUser'
 import { getPost } from './getPost'
 import { like } from './like'
+import { addComment } from './addComment'
+
 export {
   like,
   getPost,
@@ -21,4 +23,5 @@ export {
   uploadCover,
   uploadAvatar,
   deleteUser,
+  addComment,
 }

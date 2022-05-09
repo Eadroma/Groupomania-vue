@@ -68,6 +68,11 @@ export default {
   height: 100vh;
 }
 
+.headline {
+  width: 80%;
+  margin-left: 2rem;
+}
+
 .headText {
   margin-top: 0;
   padding: 0;
@@ -84,7 +89,7 @@ export default {
 
 .avatar-name {
   display: flex;
-  width: 25%;
+  width: 50%;
   align-items: center;
   justify-content: space-between;
 }
