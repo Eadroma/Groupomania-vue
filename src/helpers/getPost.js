@@ -1,5 +1,7 @@
 const getPost = id => {
-  return fetch('http://localhost:8081/api/posts/ ' + id).then(r => r.json())
+  return fetch('https://eadromania-back.herokuapp.com/api/posts/ ' + id).then(
+    r => r.json()
+  )
 }
 
 export { getPost }

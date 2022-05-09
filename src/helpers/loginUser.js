@@ -1,5 +1,5 @@
 const loginUser = (email, password) => {
-  return fetch('http://localhost:8081/api/users/login', {
+  return fetch('https://eadromania-back.herokuapp.com/api/users/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
