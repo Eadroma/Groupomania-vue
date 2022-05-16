@@ -454,4 +454,21 @@ export default {
   justify-content: space-between;
   margin-top: 10px;
 }
+
+@media only screen and (max-width: 425px) {
+  .avatar-name {
+    width: 100%;
+  }
+  .headText {
+    flex-direction: column;
+  }
+  .head-left {
+    width: 100%;
+  }
+
+  .overlay-buttons {
+    flex-direction: column;
+    margin-bottom: 2rem;
+  }
+}
 </style>

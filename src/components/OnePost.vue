@@ -1,18 +1,26 @@
 <template>
-  <v-container>
+  <v-container class="postView">
     <div v-if="isLoading" class="loadingSkeletons">
       <v-skeleton-loader type="article, image"> </v-skeleton-loader>
     </div>
     <div class="postContainer" v-else>
       <v-card class="postCard" v-if="userp">
         <v-list-item class="headerCard">
-          <v-list-item-avatar color="grey darken-3">
+          <v-list-item-avatar
+            color="grey darken-3"
+            @click="redirect(userp.id)"
+            class="pointer"
+          >
             <v-img class="elevation-6" alt="image" :src="userp.imgUrl"> </v-img>
           </v-list-item-avatar>
 
           <v-list-item-content>
-            <v-list-item-title style="margin-left: 10px"
-              >{{ userp.name }} - {{ userp.email }} -
+            <v-list-item-title
+              style="margin-left: 10px"
+              @click="redirect(userp.id)"
+              class="pointer"
+              >{{ userp ? userp.name : 'name' }} -
+              {{ userp ? userp.email : 'email' }} -
               {{
                 new Date(post.createdAt).toLocaleDateString()
               }}</v-list-item-title
@@ -24,7 +32,7 @@
           <v-spacer></v-spacer>
         </v-card-text>
         <div v-if="post && post.imgUrl">
-          <v-img :src="post.imgUrl" contain max-height="500px"></v-img>
+          <v-img :src="post.imgUrl" contain max-height="420px"></v-img>
         </div>
         <v-card-actions class="postButtons">
           <div>
@@ -68,7 +76,7 @@
           </div>
 
           <div v-if="isLoggedIn && user && user.id == userp.id">
-            <v-btn class="ml-2 comment" text small>
+            <v-btn class="ml-2 comment" text small @click="editable = true">
               <v-icon> mdi-pencil </v-icon>
             </v-btn>
           </div>
@@ -95,7 +103,7 @@
         width="400"
         height="580"
         max-height="580"
-        class="mx-auto"
+        class="mx-aut commentContainer"
         v-if="comments"
       >
         <div class="noComment" v-if="post.comments.length == 0">
@@ -148,6 +156,82 @@
       <v-icon color="#fc256f" style="margin-right: 4px"> mdi-alert </v-icon
       >{{ errorMsg }}
     </v-snackbar>
+    <!-- overlay for edit post -->
+    <v-overlay :value="editable" :opacity="0.8" style="width: 100%">
+      <v-card class="postCard">
+        <v-list-item class="headerCard">
+          <v-list-item-avatar color="grey darken-3">
+            <v-img
+              class="elevation-6"
+              alt="image"
+              :src="userp ? userp.imgUrl : 'W'"
+            >
+            </v-img>
+          </v-list-item-avatar>
+
+          <v-list-item-content>
+            <v-list-item-title style="margin-left: 10px"
+              >{{ userp ? userp.name : 'name' }} -
+              {{ userp ? userp.email : 'email' }} -
+              {{
+                new Date(post ? post.createdAt : 0).toLocaleDateString()
+              }}</v-list-item-title
+            >
+          </v-list-item-content>
+        </v-list-item>
+        <v-textarea
+          required
+          v-model="textEdit"
+          counter
+          :rules="rules"
+          name="updatePost"
+          solo
+          v-bind:value="post ? post.textContent : ''"
+          style="align-items: center; height: 80%"
+        >
+        </v-textarea>
+        <v-file-input
+          v-model="fileEdit"
+          accept="image/jpg, image/jpeg, image/png, image/webp, image/gif, video/x-msvideo, video/mp4, video/mpeg, video/ogg, video/mp2t, video/webm, video/3gpp, video/3gpp2"
+          label="File input"
+          filled
+          prepend-inner-icon="mdi-file-image-plus"
+          prepend-icon=""
+          style="width: 80%; margin: 0 auto"
+        ></v-file-input>
+      </v-card>
+      <!-- form for edit post -->
+      <div class="button-container">
+        <v-btn color="#D06A6C" @click="cancelOverlay" style="color: #fff">
+          Reset
+        </v-btn>
+        <v-btn color="#D06A6C" @click="deletePost" style="color: #fff">
+          Supprimer
+        </v-btn>
+        <v-btn
+          color="#78d06a"
+          :loading="loading"
+          class="mr-4"
+          @click="validate"
+          style="color: #fff"
+          :disabled="
+            (textEdit == '' || textEdit == post.textContent) && fileEdit == null
+          "
+        >
+          Envoyer
+        </v-btn>
+        <!-- snackbar to notif user if edit is valid -->
+        <v-snackbar v-model="snackbar" :timeout="timeout">
+          {{ text }}
+
+          <template v-slot:action="{ attrs }">
+            <v-btn color="blue" text v-bind="attrs" @click="snackbar = false">
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar>
+      </div>
+    </v-overlay>
   </v-container>
 </template>
 
@@ -169,6 +253,14 @@ export default {
     comments: false,
     commentText: '',
     loadingComments: false,
+    editable: false,
+    textEdit: '',
+    fileEdit: null,
+    loading: false,
+    snackbar: false,
+    timeout: 3000,
+    text: '',
+    rules: [v => v.length < 256 || 'Max 256 characters'],
   }),
   computed: {
     ...mapState({
@@ -192,6 +284,7 @@ export default {
     async setPost() {
       const data = await getPost(this.id)
       this.post = data.post
+      this.textEdit = data.post.textContent
       this.post.userLiked = data.post.userLiked.reverse()
     },
     async setUser() {
@@ -248,10 +341,81 @@ export default {
       return this.users ? this.users.find(user => user.id == id) : null
     },
     async redirect(id) {
-      if (id === this.user?.id || !this.isLoggedIn) this.setTab(1)
+      if (this.isLoggedIn && id === this.user.id) this.setTab(1)
       else {
         this.setUserView(await getUser(id))
-        this.setTab(this.showSettings ? 3 : 2)
+        this.setTab(this.isLoggedIn ? 3 : 1)
+      }
+    },
+    cancelOverlay() {
+      this.editable = false
+      this.textEdit = this.post.textContent
+      this.fileEdit = null
+    },
+    async validate() {
+      this.loading = true
+      if (
+        (this.textEdit.length > 256 || this.textEdit.length < 1) &&
+        this.fileEdit == null
+      ) {
+        this.text = 'Veuillez entrer un commentaire de moins de 256 caractères'
+        this.snackbar = true
+        this.loading = false
+      } else {
+        const formData = new FormData()
+        formData.append('content', this.textEdit)
+        formData.append('image', this.fileEdit)
+        const response = await fetch(
+          `https://groupomaedromaback.herokuapp.com/api/posts/${this.post.id}`,
+          {
+            method: 'PUT',
+            headers: {
+              Authorization: `${this.token}`,
+            },
+            body: formData,
+          }
+        )
+        const data = await response.json()
+        if (response.status != 200) {
+          this.text = data.message
+          this.snackbar = true
+          this.loading = false
+          this.fileEdit = null
+          this.textEdit = this.post.textContent
+        } else {
+          this.editable = false
+          this.text = 'Votre post a bien été modifié !'
+          this.loading = false
+          this.snackbar = true
+          this.post = data.post
+          this.fileEdit = null
+          this.textEdit = this.post.textContent
+        }
+      }
+    },
+    async deletePost() {
+      const response = await fetch(
+        `https://groupomaedromaback.herokuapp.com/api/posts/${this.post.id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `${this.token}`,
+          },
+        }
+      )
+      const data = await response.json()
+      if (response.status != 200) {
+        this.text = data.message
+        this.snackbar = true
+      } else {
+        this.$emit('update-posts', this.post.id)
+        this.editable = false
+        this.text = 'Votre post a bien été supprimé !!'
+        this.loading = false
+        this.snackbar = true
+        this.post = data.post
+        this.fileEdit = null
+        this.textEdit = ''
       }
     },
   },
@@ -263,17 +427,17 @@ export default {
   padding: 0 !important;
 }
 
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
 .postContainer {
   display: flex;
   width: 80%;
-  margin: auto;
   justify-content: space-between;
   margin-bottom: 2rem;
-}
-
-.postCard {
-  margin: 0 1rem;
-  height: 580px;
 }
 
 .commentSection {
@@ -281,6 +445,26 @@ export default {
   overflow-y: scroll;
   height: 87%;
   max-height: 500px;
+}
+
+@media (max-width: 768px) {
+  .postContainer {
+    flex-direction: column;
+  }
+  .commentSection {
+    width: 100%;
+    max-height: 13vh;
+  }
+  .commentContainer {
+    width: 100% !important;
+    max-height: 23vh !important;
+    margin: 1rem;
+    max-width: 100% !important;
+  }
+}
+.postCard {
+  margin: 0 1rem;
+  height: 580px;
 }
 
 .noComment {
@@ -324,5 +508,28 @@ export default {
   align-items: center;
   flex: 0;
   margin: auto;
+}
+
+.pointer:hover {
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 425px) {
+  .postView {
+    width: 100%;
+    padding: 0;
+  }
+  .postContainer {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+  .postCard {
+    margin: 0;
+  }
+  .commentContainer {
+    margin: 1rem 0;
+  }
 }
 </style>

@@ -23,39 +23,50 @@
         <v-card-text class="headText">
           <v-card-text>{{ user.description }}</v-card-text>
         </v-card-text>
+        <v-btn class="ma-1 right" dark color="#272727" fill @click="clearTab">
+          Fermer
+        </v-btn>
       </v-card-title>
     </v-card>
 
-    <div class="ProfileBody">this is my profile body</div>
+    <div class="ProfileBody">
+      <all-post :posts="posts" />
+    </div>
   </v-container>
 </template>
 
 <script>
-import { validationMixin } from 'vuelidate'
-import { email, minLength, maxLength } from 'vuelidate/lib/validators'
+import { mapActions } from 'vuex'
+import { getPostsWithId } from '@/helpers/getPostsWithId'
+import AllPost from './AllPost.vue'
+
 export default {
   name: 'ProfilePage',
-  mixins: [validationMixin],
-  components: {},
+  components: { AllPost },
   props: {
     user: Object,
   },
-  validations: {
-    name: {
-      minLength: minLength(3),
-      maxLength: maxLength(20),
+  data: () => ({
+    posts: [],
+    loading: false,
+  }),
+  created: function () {
+    this.getPosts(this.user.id)
+  },
+  computed: {},
+  methods: {
+    ...mapActions(['setUserView', 'setTab']),
+    clearTab() {
+      this.setTab(0)
+      this.setUserView(null)
     },
-    email: {
-      email,
-    },
-    description: {
-      minLength: minLength(3),
-      maxLength: maxLength(200),
+    async getPosts(id) {
+      this.loading = true
+      const data = await (await getPostsWithId(id)).json()
+      this.posts = data.reverse()
+      this.loading = false
     },
   },
-  data: () => ({}),
-  computed: {},
-  methods: {},
 }
 </script>
 
@@ -127,5 +138,9 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-top: 10px;
+}
+
+.ProfileBody {
+  margin-top: 2rem;
 }
 </style>

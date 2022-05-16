@@ -9,7 +9,7 @@
           max-width="32"
         />
       </v-app-bar-nav-icon>
-      <v-tabs align-with-title :value="tab">
+      <v-tabs align-with-title :value="tab" class="tabContainer">
         <v-tab @click="setTab(0)"> Home </v-tab>
         <v-tab v-if="isLoggedIn" @click="getConnectedUser && setTab(1)"
           >Mon profile</v-tab
@@ -160,6 +160,16 @@
           </div>
         </v-overlay>
       </v-sheet>
+      <v-tabs align-with-title :value="tab" class="tabContainerMobile">
+        <v-tab @click="setTab(0)"> Home </v-tab>
+        <v-tab v-if="isLoggedIn" @click="getConnectedUser && setTab(1)"
+          >Mon profile</v-tab
+        >
+        <v-tab v-if="isLoggedIn" @click="setTab(2)">Settings</v-tab>
+        <v-tab v-if="checkTab" @click="setTab(isLoggedIn ? 3 : 1)">
+          Profile de {{ userView.name }}</v-tab
+        >
+      </v-tabs>
     </v-card>
   </div>
 </template>
@@ -174,7 +184,13 @@ import HomePageVue from './components/HomePage.vue'
 import MyProfilePage from './components/MyProfilePage.vue'
 import ProfilePage from './components/ProfilePage.vue'
 import SettingsPage from './components/SettingsPage.vue'
-import { getUsers, getUser, createUser, loginUser } from './helpers/helper'
+import {
+  getUsers,
+  getUser,
+  createUser,
+  loginUser,
+  checkToken,
+} from './helpers/helper'
 export default {
   name: 'App',
   mixins: [validationMixin],
@@ -218,6 +234,7 @@ export default {
   },
   computed: {
     checkTab() {
+      console.log(this.userView && this.userView?.id != this.user?.id)
       return this.userView && this.userView.id != this.user?.id
     },
     emailErrors() {
@@ -254,6 +271,7 @@ export default {
       tab: 'tab',
       userView: 'userView',
       user: 'user',
+      token: 'token',
     }),
   },
   created() {
@@ -280,12 +298,17 @@ export default {
     },
     async initData() {
       this.users = await getUsers()
+      this.setTab(0)
+      const checkAuth = await (await checkToken(this.token)).json()
+      if (checkAuth.name == 'TokenExpiredError') {
+        this.logout()
+      }
     },
     async redirect(id) {
       if (this.isLoggedIn && id === this.user.id) this.setTab(1)
       else {
         this.setUserView(await getUser(id))
-        this.setTab(this.showSettings ? 3 : 2)
+        this.setTab(this.isLoggedIn ? 3 : 2)
       }
     },
     logout() {
@@ -294,7 +317,7 @@ export default {
     async handleSignup() {
       this.loading = true
       const response = await createUser(this.email, this.password)
-      const data = response.json()
+      const data = await response.json()
       if (response.status != 201) this.passwordFeedback = data.message
       else {
         this.passwordFeedback = ''
@@ -419,7 +442,11 @@ button {
   margin: 0 10px;
 }
 
-@media only screen and (max-width: 320px) {
+.tabContainer {
+  display: block;
+}
+
+@media only screen and (max-width: 425px) {
   .v-app-bar-title__content {
     display: none;
   }
@@ -430,6 +457,21 @@ button {
 
   #desktopLogout {
     display: none;
+  }
+  .tabContainer {
+    display: none;
+  }
+
+  .tabContainerMobile {
+    position: fixed;
+    bottom: 0rem;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .avatar-name {
+    width: 100%;
   }
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <v-container class="container">
     <div v-if="isLoggedIn">
-      <v-card v-if="!user">
+      <v-card v-if="user.length <= 0 && posts.length <= 0">
         <v-skeleton-loader
           v-bind="user"
           type="card-avatar, article"
@@ -23,20 +23,12 @@
           <v-card-text class="headText">
             <v-card-text>{{ user.description }}</v-card-text>
           </v-card-text>
-          <v-btn
-            class="ma-1 right"
-            dark
-            color="#272727"
-            fill
-            @click="showSettings"
-          >
-            Modifier
-          </v-btn>
         </v-card-title>
       </v-card>
 
       <div class="ProfileBody">
-        <add-post />
+        <add-post @add-posts="addPosts" />
+        <posts-profile :posts="posts" @update-posts="updatePosts" />
       </div>
     </div>
   </v-container>
@@ -45,19 +37,41 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import AddPost from './AddPost.vue'
+import PostsProfile from './PostsProfile.vue'
+import { getPostsWithId } from '@/helpers/getPostsWithId'
 export default {
   name: 'ProfilePage',
   components: {
     AddPost,
+    PostsProfile,
   },
+  data: () => ({
+    posts: [],
+  }),
   computed: {
     ...mapState({ isLoggedIn: 'isLoggedIn', user: 'user' }),
+  },
+  created: function () {
+    this.getPosts()
   },
   methods: {
     ...mapActions(['setTab', 'setShowSettings']),
     showSettings() {
       this.setTab(2)
       this.setShowSettings(true)
+    },
+    addPosts(post) {
+      this.posts.unshift(post)
+    },
+    updatePosts(id) {
+      this.posts = this.posts.filter(item => item.id != id)
+    },
+    async getPosts() {
+      this.loading = true
+      const data = await (await getPostsWithId(this.user.id)).json()
+      console.log(data)
+      this.posts = data.reverse()
+      this.loading = false
     },
   },
 }

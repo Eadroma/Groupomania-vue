@@ -45,9 +45,6 @@ export default new Vuex.Store({
     setShowSettings(state) {
       state.showSettings = !state.showSettings
     },
-    setTab(state, tab) {
-      state.tab = tab
-    },
   },
   actions: {
     setUserView({ commit }, userView) {
@@ -70,7 +67,7 @@ export default new Vuex.Store({
     },
     getConnectedUser() {
       if (this.state.token == null) return null
-      return fetch('http://localhost:8081/api/users/me', {
+      return fetch('https://groupomaedromaback.herokuapp.com/api/users/me', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -79,7 +76,6 @@ export default new Vuex.Store({
       })
         .then(response => response.json())
         .then(data => {
-          console.log(data)
           if (data.name == 'TokenExpiredError') {
             this.state.token = null
             this.state.isLoggedIn = false
@@ -92,6 +88,7 @@ export default new Vuex.Store({
       this.commit('setUser', null)
       this.commit('setToken', null)
       this.commit('setIsLoggedIn', false)
+      this.commit('setUserView', null)
     },
   },
   getters: {

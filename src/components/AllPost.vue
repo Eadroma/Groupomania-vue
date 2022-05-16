@@ -9,10 +9,16 @@
       </v-col>
     </div>
     <v-item-group active-class="primary" v-else>
-      <v-container>
-        <v-col>
-          <v-col v-for="post in posts" :key="post.id" cols="auto" md="auto">
-            <OnePost :id="post.id" :users="users" />
+      <v-container class="pd0">
+        <v-col class="pd0">
+          <v-col
+            class="pd0"
+            v-for="post in posts"
+            :key="post.id"
+            cols="auto"
+            md="auto"
+          >
+            <OnePost :id="post.id" :users="users" @update-posts="updatePosts" />
           </v-col>
         </v-col>
       </v-container>
@@ -27,8 +33,13 @@ import OnePostVue from './OnePost.vue'
 import OnePost from './OnePost.vue'
 export default {
   name: 'AllPost',
+  props: {
+    posts: {
+      type: Array,
+      default: () => [],
+    },
+  },
   data: () => ({
-    posts: null,
     users: null,
     loading: true,
   }),
@@ -43,7 +54,6 @@ export default {
     },
   },
   created: function () {
-    this.getPosts()
     this.getUsers()
   },
   methods: {
@@ -61,6 +71,11 @@ export default {
     },
     getUser(id) {
       return this.users ? this.users.find(user => user.id == id) : null
+    },
+    async updatePosts(id) {
+      this.$emit('update-posts', id)
+      // this.posts = this.posts.filter(item => item.id != id)
+      // this.getPosts()
     },
   },
 }
@@ -90,5 +105,19 @@ export default {
 
 .like {
   color: rgb(208, 106, 108) !important;
+}
+
+@media only screen and (max-width: 425px) {
+  .container-AllPosts {
+    padding: 0;
+  }
+
+  .container-AllPosts-header-title {
+    margin-bottom: 2rem;
+  }
+
+  .pd0 {
+    padding: 0;
+  }
 }
 </style>

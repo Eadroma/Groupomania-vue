@@ -10,6 +10,8 @@ import { deleteUser } from './deleteUser'
 import { getPost } from './getPost'
 import { like } from './like'
 import { addComment } from './addComment'
+import { checkToken } from './checkToken'
+import { getPostsWithId } from './getPostsWithId'
 
 export {
   like,
@@ -24,4 +26,6 @@ export {
   uploadAvatar,
   deleteUser,
   addComment,
+  checkToken,
+  getPostsWithId,
 }
