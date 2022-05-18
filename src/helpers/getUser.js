@@ -1,6 +1,6 @@
 const getUser = id => {
-  return fetch('https://groupomaedromaback.herokuapp.com/api/users/' + id).then(
-    r => (r.status == 201 ? r.json() : null)
+  return fetch('http://localhost:8081/api/users/' + id).then(r =>
+    r.status == 201 ? r.json() : null
   )
 }
 

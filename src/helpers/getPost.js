@@ -1,7 +1,5 @@
 const getPost = id => {
-  return fetch(
-    'https://groupomaedromaback.herokuapp.com/api/posts/ ' + id
-  ).then(r => r.json())
+  return fetch('http://localhost:8081/api/posts/ ' + id).then(r => r.json())
 }
 
 export { getPost }

@@ -76,16 +76,13 @@ export default {
         const formData = new FormData()
         formData.append('content', this.content)
         formData.append('image', this.file)
-        const response = await fetch(
-          `https://groupomaedromaback.herokuapp.com/api/posts/create`,
-          {
-            method: 'POST',
-            headers: {
-              authorization: this.token,
-            },
-            body: formData,
-          }
-        )
+        const response = await fetch(`http://localhost:8081/api/posts/create`, {
+          method: 'POST',
+          headers: {
+            authorization: this.token,
+          },
+          body: formData,
+        })
         const data = await response.json()
         if (response.status != 201) {
           this.text = data.message

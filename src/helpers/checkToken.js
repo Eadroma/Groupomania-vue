@@ -1,5 +1,5 @@
 const checkToken = token => {
-  return fetch(`https://groupomaedromaback.herokuapp.com/api/users/me`, {
+  return fetch(`http://localhost:8081/api/users/me`, {
     method: 'GET',
     headers: {
       authorization: token,

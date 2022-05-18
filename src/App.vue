@@ -300,7 +300,11 @@ export default {
       this.users = await getUsers()
       this.setTab(0)
       const checkAuth = await (await checkToken(this.token)).json()
-      if (checkAuth.name == 'TokenExpiredError') {
+      console.log(checkAuth)
+      if (
+        checkAuth.message == 'Invalid token.' ||
+        checkAuth.message == 'Invalid User.'
+      ) {
         this.logout()
       }
     },

@@ -409,7 +409,7 @@ export default {
 
 .avatar-name {
   display: flex;
-  width: 25%;
+  width: 50%;
   align-items: center;
   justify-content: space-between;
 }

@@ -1,5 +1,6 @@
 const updateUser = (objectForm, id, token) => {
-  return fetch('https://groupomaedromaback.herokuapp.com/api/users/' + id, {
+  console.log(id)
+  return fetch('http://localhost:8081/api/users/' + id, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',

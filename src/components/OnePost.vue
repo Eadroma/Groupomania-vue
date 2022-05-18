@@ -75,7 +75,9 @@
             </v-menu>
           </div>
 
-          <div v-if="isLoggedIn && user && user.id == userp.id">
+          <div
+            v-if="isLoggedIn && ((user && user.id == userp.id) || user.isAdmin)"
+          >
             <v-btn class="ml-2 comment" text small @click="editable = true">
               <v-icon> mdi-pencil </v-icon>
             </v-btn>
