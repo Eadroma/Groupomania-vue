@@ -159,7 +159,12 @@
       >{{ errorMsg }}
     </v-snackbar>
     <!-- overlay for edit post -->
-    <v-overlay :value="editable" :opacity="0.8" style="width: 100%">
+    <v-overlay
+      :value="editable"
+      :opacity="0.8"
+      style="width: 100%"
+      class="editOverlay"
+    >
       <v-card class="postCard">
         <v-list-item class="headerCard">
           <v-list-item-avatar color="grey darken-3">
@@ -429,6 +434,9 @@ export default {
   padding: 0 !important;
 }
 
+.v-overlay__content {
+  width: 80%;
+}
 .button-container {
   display: flex;
   justify-content: space-between;
@@ -449,7 +457,7 @@ export default {
   max-height: 500px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
   .postContainer {
     flex-direction: column;
   }

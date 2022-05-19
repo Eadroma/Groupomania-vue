@@ -46,9 +46,11 @@ export default {
 </script>
 
 <style>
-@media (min-width: 960px) {
+@media (max-width: 1024px) {
   .container {
     max-width: 960px;
+    margin: 0;
+    padding: 0;
   }
 }
 </style>
