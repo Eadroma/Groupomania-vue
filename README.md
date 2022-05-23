@@ -1,4 +1,4 @@
-# Groupomania - Back
+# Groupomania - Front
 
 Creation of a corporate social network using : 
  - **Vue, vuetify for the front**
