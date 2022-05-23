@@ -1,6 +1,18 @@
-# front
+# Groupomania - Back
 
-## Project setup
+Creation of a corporate social network using : 
+ - **Vue, vuetify for the front**
+ - Express, sequelize js for the back.
+
+
+
+
+## Authors
+
+- [@eadroma](https://www.github.com/eadroma)
+
+## Run Locally
+
 ```
 npm install
 ```
@@ -19,6 +31,3 @@ npm run build
 ```
 npm run lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
