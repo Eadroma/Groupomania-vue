@@ -48,7 +48,6 @@
               class="white--text"
               color="#272727"
               @click.prevent="cancelForm"
-              :loading="formLoading"
               small
             >
               Reset
